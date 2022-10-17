@@ -21,7 +21,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Get("/", views.HomePage)
 	r.Get("/movies", views.MoviesAPI)
-	r.Post("/movies", views.MoviesAPI)
+	//r.Post("/movies", views.MoviesAPI)
 	r.Get("/movies/details", views.DetailsMovieAPI)
 	r.Delete("/movies/delete", views.DeleteMovieAPI)
 	r.Put("/movies/update", views.UpdateMovieAPI)
