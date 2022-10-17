@@ -28,12 +28,13 @@ type PutMovie struct {
 func MoviesAPI(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("content-type", "application/json")
 	db := conn.SetupDB()
-	fmt.Println("LINE 31")
+	fmt.Println("Method: ", r.Method)
 
 	if r.Method == "GET" {
 		mgs.PrintMessage("Getting Movie List... ")
 		rows, err := db.Query("SELECT * FROM movies")
 		mgs.CheckErr(err)
+		fmt.Println("Moviesssss", rows)
 
 		var movies []Movie
 
@@ -72,6 +73,31 @@ func MoviesAPI(w http.ResponseWriter, r *http.Request) {
 			}
 
 		}
+	}
+}
+
+func DetailsMovieAPI(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Movie Details Data")
+	if r.Method == "GET" {
+		db := conn.SetupDB()
+		id := r.URL.Query().Get("id")
+
+		row, err := db.Query("SELECT * FROM movies WHERE id=$1", id)
+		mgs.CheckErr(err)
+		fmt.Println("Moviesssss", row)
+
+		var movies []Movie
+
+		for row.Next() {
+			var id int
+			var MovieName string
+			var Year string
+			err = row.Scan(&id, &MovieName, &Year)
+			mgs.CheckErr(err)
+			movies = append(movies, Movie{MovieName, Year})
+		}
+		var response = JsonResponse{Type: "success", Data: movies}
+		json.NewEncoder(w).Encode(response)
 	}
 }
 
