@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"log"
 	"movie_review_apis/mgs"
+	"movie_review_apis/models"
 )
 
 const (
@@ -15,17 +17,29 @@ const (
 	DB_NAME     = "movies"
 )
 
-//func SetupDB() *sql.DB {
-//	dbinfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)
-//	db, err := sql.Open("postgres", dbinfo)
-//	mgs.CheckErr(err)
-//	return db
-//}
+var db *gorm.DB
 
-func SetupDB() *gorm.DB {
-	// https://github.com/jackc/pgx
+// Init creates a new connection to the database ...
+func Init() {
 	dbinfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=Asia/Shanghai", DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)
-	db, err := gorm.Open(postgres.Open(dbinfo), &gorm.Config{})
-	mgs.CheckErr(err)
+	var err error
+	db, err = gorm.Open(postgres.Open(dbinfo))
+
+	if err != nil {
+		log.Println("Failed to connect to database")
+		mgs.CheckErr(err)
+	}
+	log.Println("Database connected")
+	db.AutoMigrate(models.Movie{})
+}
+
+// GetDB ...
+func GetDB() *gorm.DB {
 	return db
+}
+
+// CloseDB ...
+func CloseDB() {
+	db, _ := db.DB()
+	db.Close()
 }
