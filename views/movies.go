@@ -2,101 +2,130 @@ package views
 
 import (
 	"encoding/json"
-	"fmt"
-	"movie_review_apis/conn"
 	"movie_review_apis/mgs"
 	"movie_review_apis/models"
+	"movie_review_apis/querydir"
 	"net/http"
+	"strconv"
 )
 
-type JsonResponse struct {
+type JsonResponseSingle struct {
+	Type    string       `json:"type"`
+	Data    models.Movie `json:"data"`
+	Message string       `json:"message"`
+}
+
+type JsonResponseMultiple struct {
 	Type    string         `json:"type"`
 	Data    []models.Movie `json:"data"`
 	Message string         `json:"message"`
 }
 
-type PutMovie struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-	Year string `json:"year"`
-}
-
 // GetMoviesAPI ...
 func GetMoviesAPI(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("content-type", "application/json")
-	var movies []models.Movie
-	db := conn.GetDB()
-	db.Find(&movies)
-	fmt.Println(movies)
-	var response = JsonResponse{Type: "success", Data: movies}
-	json.NewEncoder(w).Encode(response)
+
+	movies, err := querydir.MovieGetQuery()
+	if err == nil {
+		var response = JsonResponseMultiple{Type: "success", Data: movies}
+		json.NewEncoder(w).Encode(response)
+	} else {
+		mgs.CheckErr(err)
+	}
+
 }
 
 // CreateMovieAPI ...
-func CreateMovieAPI(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("content-type", "application/json")
-	db := conn.GetDB()
-	var mv models.Movie
-	err := json.NewDecoder(r.Body).Decode(&mv)
-	if err != nil {
-		mgs.CheckErr(err)
-	} else {
-		var response JsonResponse
-		if mv.Name == "" || mv.Year == "" {
-			response = JsonResponse{Type: "error", Message: "movieID or movieName missing"}
-		} else {
-			movie := models.Movie{Name: mv.Name, Year: mv.Year}
-			db.Create(&movie)
-			response = JsonResponse{Type: "success", Message: "Movie has been inserted"}
-			json.NewEncoder(w).Encode(response)
-		}
-
-	}
-}
+//func CreateMovieAPI(w http.ResponseWriter, r *http.Request) {
+//	w.Header().Add("content-type", "application/json")
+//	db := conn.GetDB()
+//	var mv models.Movie
+//	err := json.NewDecoder(r.Body).Decode(&mv)
+//	if err != nil {
+//		mgs.CheckErr(err)
+//	} else {
+//		var response JsonResponseSingle
+//		if mv.Name == "" || mv.Year == "" {
+//			response = JsonResponseSingle{Type: "error", Message: "movieID or movieName missing"}
+//		} else {
+//			movie := models.Movie{Name: mv.Name, Year: mv.Year}
+//			db.Create(&movie)
+//			response = JsonResponseSingle{Type: "success", Message: "Movie has been inserted"}
+//			json.NewEncoder(w).Encode(response)
+//		}
+//
+//	}
+//}
 
 // DetailsMovieAPI ...
 func DetailsMovieAPI(w http.ResponseWriter, r *http.Request) {
-	db := conn.GetDB()
 	id := r.URL.Query().Get("id")
-	var movie []models.Movie
-	db.Find(&movie, "id=?", id)
-	var response = JsonResponse{Type: "success", Data: movie}
-	json.NewEncoder(w).Encode(response)
+	idInt, _ := strconv.Atoi(id)
+	movie, err := querydir.MovieDetailQuery(idInt)
+	if err != nil {
+		res := JsonResponseSingle{Type: "error", Data: models.Movie{}}
+		json.NewEncoder(w).Encode(res)
+	} else {
+		var response = JsonResponseSingle{Type: "success", Data: *movie}
+		json.NewEncoder(w).Encode(response)
+	}
+
 }
 
 // DeleteMovieAPI ...
 func DeleteMovieAPI(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
-	var response JsonResponse
+	var response JsonResponseSingle
+
 	if id == "" {
-		response = JsonResponse{Type: "error", Message: "You are missing something"}
+		response = JsonResponseSingle{Type: "error", Message: "You are missing something"}
 	} else {
-		db := conn.GetDB()
-		var movie models.Movie
-		db.Where("id=?", id).Delete(&movie)
-		response = JsonResponse{Type: "success", Message: "Movie Deleted"}
+		idInt, _ := strconv.Atoi(id)
+		status, err := querydir.MovieDeleteQuery(idInt)
+		if err != nil {
+			mgs.CheckErr(err)
+		}
+		response = JsonResponseSingle{Type: "success", Message: strconv.Itoa(status)}
 	}
 	json.NewEncoder(w).Encode(response)
 
+}
+
+type UpdateMovieRequest struct {
+	FirstName string
+	LastName  string
+	Email     string
 }
 
 // UpdateMovieAPI ...
 func UpdateMovieAPI(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("content-type", "application/json")
-	db := conn.GetDB()
-	var movie models.Movie
-	var pm PutMovie
-	var response JsonResponse
+	id := r.URL.Query().Get("id")
+	idInt, _ := strconv.Atoi(id)
+	var pm models.Movie
 	err := json.NewDecoder(r.Body).Decode(&pm)
 	if err != nil {
 		mgs.CheckErr(err)
 	} else {
-		id := r.URL.Query().Get("id")
-		db.Find(&movie, "id=?", id)
-		movie.Name = pm.Name
-		movie.Year = pm.Year
-		db.Where("id=?", id).Save(&movie)
-		response = JsonResponse{Type: "success", Message: "Movie Updated"}
+		querydir.MovieUpdateQuery(idInt, &pm)
+
+		//response = JsonResponseSingle{Type: "success", Message: res}
 	}
-	json.NewEncoder(w).Encode(response)
+	//json.NewEncoder(w).Encode(response)
 }
+
+/*
+
+type User struct{
+  ID int
+  Name string
+  Email string
+}
+
+
+{
+   "first_name": "Mahin",
+   "last_name": "Dev",
+   "email": "mahin@dev.com"
+}
+*/

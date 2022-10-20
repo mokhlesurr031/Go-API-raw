@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-//Main ...
+// Main ...
 func main() {
 	log.Println("Starting server....")
 	r := chi.NewRouter()
@@ -17,7 +17,7 @@ func main() {
 
 	r.Get("/", views.HomePage)
 	r.Get("/movies/get", views.GetMoviesAPI)
-	r.Post("/movies/add", views.CreateMovieAPI)
+	//r.Post("/movies/add", views.CreateMovieAPI)
 	r.Get("/movies/details", views.DetailsMovieAPI)
 	r.Delete("/movies/delete", views.DeleteMovieAPI)
 	r.Put("/movies/update", views.UpdateMovieAPI)
