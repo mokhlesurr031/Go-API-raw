@@ -2,7 +2,6 @@ package views
 
 import (
 	"encoding/json"
-	"fmt"
 	"movie_review_apis/mgs"
 	"movie_review_apis/models"
 	"movie_review_apis/querydir"
@@ -33,7 +32,6 @@ func GetMoviesAPI(w http.ResponseWriter, r *http.Request) {
 	} else {
 		mgs.CheckErr(err)
 	}
-
 }
 
 // CreateMovieAPI ...
@@ -47,7 +45,6 @@ func CreateMovieAPI(w http.ResponseWriter, r *http.Request) {
 		var response JsonResponseSingle
 		if mv.Name == "" || mv.Year == "" {
 			response = JsonResponseSingle{Type: "error", Message: "movieID or movieName missing"}
-			fmt.Println(response)
 		} else {
 			movie := models.Movie{Name: mv.Name, Year: mv.Year}
 
@@ -59,7 +56,6 @@ func CreateMovieAPI(w http.ResponseWriter, r *http.Request) {
 			response = JsonResponseSingle{Type: "success", Message: "Movie has been inserted"}
 			json.NewEncoder(w).Encode(response)
 		}
-
 	}
 }
 
@@ -75,7 +71,6 @@ func DetailsMovieAPI(w http.ResponseWriter, r *http.Request) {
 		var response = JsonResponseSingle{Type: "success", Data: *movie}
 		json.NewEncoder(w).Encode(response)
 	}
-
 }
 
 // DeleteMovieAPI ...
@@ -94,7 +89,6 @@ func DeleteMovieAPI(w http.ResponseWriter, r *http.Request) {
 		response = JsonResponseSingle{Type: "success", Message: strconv.Itoa(status)}
 	}
 	json.NewEncoder(w).Encode(response)
-
 }
 
 type UpdateMovieRequest struct {
