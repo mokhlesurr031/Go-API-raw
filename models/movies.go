@@ -1,6 +1,7 @@
 package models
 
 type Movie struct {
+	Id   int    `json:"id" gorm:"primaryKey"`
 	Name string `json:"name"`
 	Year string `json:"year"`
 }

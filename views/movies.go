@@ -2,6 +2,7 @@ package views
 
 import (
 	"encoding/json"
+	"fmt"
 	"movie_review_apis/mgs"
 	"movie_review_apis/models"
 	"movie_review_apis/querydir"
@@ -36,26 +37,31 @@ func GetMoviesAPI(w http.ResponseWriter, r *http.Request) {
 }
 
 // CreateMovieAPI ...
-//func CreateMovieAPI(w http.ResponseWriter, r *http.Request) {
-//	w.Header().Add("content-type", "application/json")
-//	db := conn.GetDB()
-//	var mv models.Movie
-//	err := json.NewDecoder(r.Body).Decode(&mv)
-//	if err != nil {
-//		mgs.CheckErr(err)
-//	} else {
-//		var response JsonResponseSingle
-//		if mv.Name == "" || mv.Year == "" {
-//			response = JsonResponseSingle{Type: "error", Message: "movieID or movieName missing"}
-//		} else {
-//			movie := models.Movie{Name: mv.Name, Year: mv.Year}
-//			db.Create(&movie)
-//			response = JsonResponseSingle{Type: "success", Message: "Movie has been inserted"}
-//			json.NewEncoder(w).Encode(response)
-//		}
-//
-//	}
-//}
+func CreateMovieAPI(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("content-type", "application/json")
+	var mv models.Movie
+	err := json.NewDecoder(r.Body).Decode(&mv)
+	if err != nil {
+		mgs.CheckErr(err)
+	} else {
+		var response JsonResponseSingle
+		if mv.Name == "" || mv.Year == "" {
+			response = JsonResponseSingle{Type: "error", Message: "movieID or movieName missing"}
+			fmt.Println(response)
+		} else {
+			movie := models.Movie{Name: mv.Name, Year: mv.Year}
+
+			_, err := querydir.MovieCreateQuery(&movie)
+			if err != nil {
+				response = JsonResponseSingle{Type: "error", Message: "movieID or movieName missing"}
+				json.NewEncoder(w).Encode(response)
+			}
+			response = JsonResponseSingle{Type: "success", Message: "Movie has been inserted"}
+			json.NewEncoder(w).Encode(response)
+		}
+
+	}
+}
 
 // DetailsMovieAPI ...
 func DetailsMovieAPI(w http.ResponseWriter, r *http.Request) {
@@ -113,19 +119,3 @@ func UpdateMovieAPI(w http.ResponseWriter, r *http.Request) {
 	}
 	//json.NewEncoder(w).Encode(response)
 }
-
-/*
-
-type User struct{
-  ID int
-  Name string
-  Email string
-}
-
-
-{
-   "first_name": "Mahin",
-   "last_name": "Dev",
-   "email": "mahin@dev.com"
-}
-*/

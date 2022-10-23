@@ -1,6 +1,7 @@
 package querydir
 
 import (
+	"fmt"
 	"movie_review_apis/conn"
 	"movie_review_apis/models"
 )
@@ -14,6 +15,17 @@ func MovieGetQuery() ([]models.Movie, error) {
 	}
 
 	return movies, nil
+}
+
+func MovieCreateQuery(movie *models.Movie) (int, error) {
+	fmt.Println("Movie", movie)
+	db := conn.GetDB()
+	err := db.Create(&movie).Error
+	if err != nil {
+		return 0, err
+	} else {
+		return 1, nil
+	}
 }
 
 // MovieDetailQuery ...

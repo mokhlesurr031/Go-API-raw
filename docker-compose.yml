@@ -8,6 +8,9 @@ services:
       POSTGRES_PASSWORD: example
     ports:
       - 5431:5432
+    volumes:
+      - ./database:/var/lib/postgresql
+
   adminer:
     image: adminer
     restart: always

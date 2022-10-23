@@ -30,6 +30,7 @@ func Init() {
 		mgs.CheckErr(err)
 	}
 	log.Println("Database connected")
+
 	db.AutoMigrate(models.Movie{})
 }
 
