@@ -2,6 +2,7 @@ package conn
 
 import (
 	"fmt"
+	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
@@ -9,18 +10,30 @@ import (
 	"movie_review_apis/models"
 )
 
-const (
-	DB_HOST     = "localhost"
-	DB_PORT     = 5431
-	DB_USER     = "postgres"
-	DB_PASSWORD = "example"
-	DB_NAME     = "movies"
-)
+//const (
+//	DB_HOST     = "localhost"
+//	DB_PORT     = 5431
+//	DB_USER     = "postgres"
+//	DB_PASSWORD = "example"
+//	DB_NAME     = "movies"
+//)
 
 var db *gorm.DB
 
 // Init creates a new connection to the database ...
 func Init() {
+	viper.AddConfigPath("/Users/pathao/go/src/movie_review_apis/config")
+	viper.SetConfigFile("/Users/pathao/go/src/movie_review_apis/config/db.yaml")
+	er := viper.ReadInConfig()
+	if er != nil {
+		log.Println(er)
+	}
+	DB_PORT := viper.Get("server.port")
+	DB_HOST := viper.Get("server.host")
+	DB_USER := viper.Get("database.user")
+	DB_PASSWORD := viper.Get("database.password")
+	DB_NAME := viper.Get("database.db")
+
 	dbinfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=Asia/Shanghai", DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)
 	var err error
 	db, err = gorm.Open(postgres.Open(dbinfo))
@@ -32,6 +45,7 @@ func Init() {
 	log.Println("Database connected")
 
 	db.AutoMigrate(models.Movie{})
+
 }
 
 // GetDB ...
