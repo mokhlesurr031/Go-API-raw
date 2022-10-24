@@ -10,14 +10,6 @@ import (
 	"movie_review_apis/models"
 )
 
-//const (
-//	DB_HOST     = "localhost"
-//	DB_PORT     = 5431
-//	DB_USER     = "postgres"
-//	DB_PASSWORD = "example"
-//	DB_NAME     = "movies"
-//)
-
 var db *gorm.DB
 
 // Init creates a new connection to the database ...
