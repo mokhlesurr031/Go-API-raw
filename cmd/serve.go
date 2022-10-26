@@ -27,9 +27,17 @@ func init() {
 }
 
 func StartServer() {
+
+	viper.AddConfigPath("./config")
+	viper.SetConfigFile("./config/db.yaml")
+	er := viper.ReadInConfig()
+	if er != nil {
+		log.Println(er)
+	}
 	port := viper.GetInt("server.port")
 
 	log.Println("Starting server....")
+	fmt.Println("Port: ", port)
 	r := chi.NewRouter()
 	conn.Init()
 

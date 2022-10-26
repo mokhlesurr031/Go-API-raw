@@ -3,7 +3,7 @@ server:
   host: "localhost"
 
 database:
-  host: "localhost"
+  host: "db"
   user: "postgres"
   password: "example"
   db: "movies"
