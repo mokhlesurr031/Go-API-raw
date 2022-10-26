@@ -1,19 +1,31 @@
 version: '3.1'
 
 services:
+  golang-service:
+    container_name: movie-go-container
+    image: movie_img
+    ports:
+      - 3000:3000
+    networks:
+      - my-network
+
   db:
     image: postgres
-    restart: always
     environment:
       POSTGRES_PASSWORD: example
     ports:
-      - 5431:5432
+      - "0.0.0.0:5431:5432"
     volumes:
       - ./database:/var/lib/postgresql
+    networks:
+      - my-network
 
   adminer:
     image: adminer
-    restart: always
     ports:
       - 8080:8080
+
+networks:
+  my-network:
+    external: false
 

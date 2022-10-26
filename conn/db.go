@@ -14,19 +14,21 @@ var db *gorm.DB
 
 // Init creates a new connection to the database ...
 func Init() {
-	viper.AddConfigPath("/Users/pathao/go/src/movie_review_apis/config")
-	viper.SetConfigFile("/Users/pathao/go/src/movie_review_apis/config/db.yaml")
+	viper.AddConfigPath("./config")
+	viper.SetConfigFile("./config/db.yaml")
 	er := viper.ReadInConfig()
 	if er != nil {
 		log.Println(er)
 	}
-	DB_PORT := viper.Get("server.port")
-	DB_HOST := viper.Get("server.host")
-	DB_USER := viper.Get("database.user")
-	DB_PASSWORD := viper.Get("database.password")
-	DB_NAME := viper.Get("database.db")
+	DB_PORT := viper.GetInt("database.port")
+	DB_HOST := viper.GetString("database.host")
+	DB_USER := viper.GetString("database.user")
+	DB_PASSWORD := viper.GetString("database.password")
+	DB_NAME := viper.GetString("database.db")
 
 	dbinfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=Asia/Shanghai", DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)
+	fmt.Println("hehehhe", dbinfo)
+
 	var err error
 	db, err = gorm.Open(postgres.Open(dbinfo))
 

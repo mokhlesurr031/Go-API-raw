@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/go-chi/chi/v5"
+	"github.com/spf13/viper"
 	"log"
 	"movie_review_apis/conn"
 	"movie_review_apis/views"
@@ -25,6 +27,8 @@ func init() {
 }
 
 func StartServer() {
+	port := viper.GetInt("server.port")
+
 	log.Println("Starting server....")
 	r := chi.NewRouter()
 	conn.Init()
@@ -36,6 +40,6 @@ func StartServer() {
 	r.Delete("/movies/delete", views.DeleteMovieAPI)
 	r.Put("/movies/update", views.UpdateMovieAPI)
 
-	http.ListenAndServe(":3000", r)
+	http.ListenAndServe(fmt.Sprintf(":%d", port), r)
 	conn.CloseDB()
 }
