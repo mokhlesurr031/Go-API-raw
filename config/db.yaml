@@ -3,8 +3,8 @@ server:
   host: "localhost"
 
 database:
-  host: "db"
+  host: "localhost"
   user: "postgres"
   password: "example"
   db: "movies"
-  port: 5432
+  port: 5431
