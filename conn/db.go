@@ -21,13 +21,14 @@ func Init() {
 		log.Println(er)
 	}
 	DB_PORT := viper.GetInt("database.port")
+	fmt.Println("PPPPP", DB_PORT)
 	DB_HOST := viper.GetString("database.host")
 	DB_USER := viper.GetString("database.user")
 	DB_PASSWORD := viper.GetString("database.password")
 	DB_NAME := viper.GetString("database.db")
 
 	dbinfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=Asia/Shanghai", DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)
-	fmt.Println("hehehhe", dbinfo)
+	fmt.Println("######", dbinfo)
 
 	var err error
 	db, err = gorm.Open(postgres.Open(dbinfo))
